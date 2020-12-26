@@ -1,6 +1,5 @@
 package com.remainderapp.todoapp;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,10 +7,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.remainderapp.todoapp.adapter.ToDoAdapter;
 
 public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
@@ -20,14 +20,15 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     public RecyclerItemTouchHelper(ToDoAdapter adapter){
         super(0,ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        this.adapter=adapter;
     }
 
     @Override
-    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target){
+    public boolean onMove(@NonNull RecyclerView recyclerView,@NonNull RecyclerView.ViewHolder viewHolder,@NonNull RecyclerView.ViewHolder target){
         return false;
     }
-
-    public void onSwiped(final RecyclerView.ViewHolder viewHolder,int direction){
+    @Override
+    public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder,int direction){
         final int position = viewHolder.getAdapterPosition();
         if(direction == ItemTouchHelper.LEFT){
             AlertDialog.Builder builder = new AlertDialog.Builder(adapter.getContext());
@@ -35,13 +36,13 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             builder.setMessage("Are You Sure You Want To Delete This Task?");
             builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialog, int which) {
                     adapter.deleteItem(position);
                 }
             });
             builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialog, int which) {
                     adapter.notifyItemChanged(viewHolder.getAdapterPosition());
                 }
             });
@@ -53,7 +54,7 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         }
     }
     @Override
-    public void onChildDraw(Canvas c , RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,float dX,float dY,int actionState,boolean isCurrentlyActive){
+    public void onChildDraw(@NonNull Canvas c ,@NonNull RecyclerView recyclerView,@NonNull RecyclerView.ViewHolder viewHolder,float dX,float dY,int actionState,boolean isCurrentlyActive){
         super.onChildDraw(c,recyclerView,viewHolder,dX,dY,actionState,isCurrentlyActive);
 
         Drawable icon;
@@ -69,6 +70,8 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
             icon = ContextCompat.getDrawable(adapter.getContext(),R.drawable.ic_baseline_delete_24);
             background = new ColorDrawable(Color.RED);
         }
+
+        assert icon != null;
         int iconMargin = (itemView.getHeight()-icon.getIntrinsicHeight())/2;
         int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight())/2;
         int iconBottom = iconTop + icon.getIntrinsicHeight();
@@ -84,7 +87,7 @@ public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
         else if(dX<0){
             int iconLeft = itemView.getRight() - iconMargin - icon.getIntrinsicWidth();
             int iconRight = itemView.getRight() - iconMargin ;
-            icon.setBounds(iconLeft,iconTop,iconRight,iconBottom);
+            icon.setBounds(iconLeft,iconTop,iconRight ,iconBottom);
 
             background.setBounds(itemView.getRight()+((int)dX) - backgroundCornerOffset,itemView.getTop(),itemView.getRight() ,itemView.getBottom());
 

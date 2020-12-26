@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListne
 
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView);//
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        tasksAdapter = new ToDoAdapter(db,this);
+        tasksAdapter = new ToDoAdapter(db,MainActivity.this);
         tasksRecyclerView.setAdapter(tasksAdapter);
 
         fab = findViewById(R.id.fab);
@@ -47,13 +47,13 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListne
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new RecyclerItemTouchHelper(tasksAdapter));
         itemTouchHelper.attachToRecyclerView(tasksRecyclerView);
 
-        /*ToDoModel task = new ToDoModel();
+        ToDoModel task = new ToDoModel();
         task.setTask("Test Task");//
         task.setStatus(0);
         task.setId(1);
 
         taskList.add(task);
-        taskList.add(task);*/
+        taskList.add(task);
 
 
         taskList = db.getAllTasks();
@@ -61,17 +61,19 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListne
         tasksAdapter.setTasks(taskList);
 
         fab.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v){
-               AddNewTask.newInstance().show(getSupportFragmentManager(),AddNewTask.TAG);
-           }
+            @Override
+            public void onClick(View v) {
+                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+            }
         });
     }
 
 
     @Override
-    public void handleDialogClose(DialogInterface dialog) {
+    public void handleDialogClose(DialogInterface dialog){
         taskList = db.getAllTasks();
         Collections.reverse(taskList);
+        tasksAdapter.setTasks(taskList);
+        tasksAdapter.notifyDataSetChanged();
     }
 }
